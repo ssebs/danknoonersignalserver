@@ -12,18 +12,38 @@ WebRTC signaling server for [DankNooner](https://github.com/ssebs/DankNooner). B
 
 ## Running
 
+### Docker
+
+```bash
+docker run -p 9080:9080 ssebs/danknoonersignalserver:latest
+```
+
+### Manual
+
 ```bash
 go run . -addr :9080
 ```
 
-Or build and run:
+### Building
 
 ```bash
 go build -o danknoonersignalserver .
 ./danknoonersignalserver -addr :9080
 ```
 
+Or build the Docker image locally:
+
+```bash
+docker build -t ssebs/danknoonersignalserver:latest .
+```
+
 Default port: `:9080`. The server listens for WebSocket connections at `/`.
+
+### Publishing
+
+```bash
+./deploy-version.sh
+```
 
 ## Integration with DankNooner
 
