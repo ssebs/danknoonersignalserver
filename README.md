@@ -2,6 +2,8 @@
 
 WebRTC signaling server for [DankNooner](https://github.com/ssebs/DankNooner). Brokers WebRTC peer connections between players via lobby codes — once peers are connected, all game traffic flows directly peer-to-peer.
 
+https://hub.docker.com/r/ssebs/danknoonersignalserver
+
 ## How it works
 
 1. Host connects via WebSocket → server creates a lobby and returns a 32-char code
@@ -13,6 +15,7 @@ WebRTC signaling server for [DankNooner](https://github.com/ssebs/DankNooner). B
 ## Running
 
 ### Docker
+
 
 ```bash
 docker run -p 9080:9080 ssebs/danknoonersignalserver:latest
