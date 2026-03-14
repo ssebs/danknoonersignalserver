@@ -288,7 +288,29 @@ func (h *Hub) ServeWS(w http.ResponseWriter, r *http.Request) {
 			p.send(msgJoin, 0, code)
 			// Joined — clear the deadline, stay connected as long as needed.
 			conn.SetReadDeadline(time.Time{})
+			// Add keepalive pings
+			const pingInterval = 30 * time.Second
+			const pongTimeout = 10 * time.Second
 
+			conn.SetPongHandler(func(string) error {
+				conn.SetReadDeadline(time.Time{})
+				return nil
+			})
+
+			go func() {
+				ticker := time.NewTicker(pingInterval)
+				defer ticker.Stop()
+				for range ticker.C {
+					p.mu.Lock()
+					conn.SetWriteDeadline(time.Now().Add(pongTimeout))
+					err := conn.WriteMessage(websocket.PingMessage, nil)
+					conn.SetWriteDeadline(time.Time{})
+					p.mu.Unlock()
+					if err != nil {
+						return
+					}
+				}
+			}()
 		case msgSeal:
 			if p.lobby == "" {
 				return
