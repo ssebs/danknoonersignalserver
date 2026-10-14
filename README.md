@@ -42,6 +42,27 @@ docker build -t ssebs/danknoonersignalserver:latest .
 
 Default port: `:9080`. The server listens for WebSocket connections at `/`.
 
+### Flags
+
+| Flag                | Default     | Description                                                                                 |
+| ------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `-addr`             | `:9080`     | Listen address                                                                              |
+| `-max-conns`        | `1000`      | Max concurrent WebSocket connections                                                        |
+| `-max-conns-per-ip` | `16`        | Max concurrent connections per client IP (IPv6: per /64)                                    |
+| `-max-lobbies`      | `500`       | Max concurrent lobbies                                                                      |
+| `-real-ip-header`   | `CF-Connecting-IP,X-Real-IP` | Comma-separated client-IP headers set by reverse proxies, first valid one wins; only trusted from loopback/private addresses |
+| `-allowed-origins`  | `https://ssebs.github.io,https://danknooner.ssebs.com` | Comma-separated browser origins allowed to connect (the web build). Native Godot clients send no `Origin` and are always allowed |
+
+The defaults fit the production path (Cloudflare → Nginx Proxy Manager → container): Cloudflare puts the player's IP in `CF-Connecting-IP`, while NPM's `X-Real-IP` only holds the Cloudflare edge IP. Without Cloudflare, NPM's `X-Real-IP` is used. If NPM isn't behind Cloudflare, clients can set `CF-Connecting-IP` themselves to dodge the per-IP limit; pass `-real-ip-header X-Real-IP` in that case.
+
+### Testing
+
+```bash
+go test -race ./...
+```
+
+Unit tests cover the lobby logic, limits and helpers; integration tests run a real server and drive it the way `multiplayer_webrtc.gd` does. CI runs them before building the Docker image.
+
 ### Publishing
 
 ```bash

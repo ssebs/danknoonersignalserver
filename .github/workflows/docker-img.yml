@@ -4,7 +4,19 @@ on:
     tags:
       - "v*"
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+      - name: Vet
+        run: go vet ./...
+      - name: Test
+        run: go test -race -count=1 ./...
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Set up QEMU
